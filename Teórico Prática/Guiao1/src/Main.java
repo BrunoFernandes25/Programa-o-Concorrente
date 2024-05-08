@@ -50,7 +50,8 @@ class Printer extends Thread {
     }
 }
 
-/*public class Main {
+//Main exercício 1
+public class Main {
     public static void main(String[] args) throws InterruptedException {  //com throws evitamos try catchs mas só porque tamos na main
         int N = Integer.parseInt(args[0]);      //nº Threads
         int I = Integer.parseInt(args[1]);      //nº Incrementos
@@ -73,7 +74,7 @@ class Printer extends Thread {
 
         System.out.println("FIM exercício 1");
     }
-}*/
+}
 
 
 //Exercício 2/3
