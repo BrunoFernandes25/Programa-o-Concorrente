@@ -77,7 +77,7 @@ class Warehouse2 {
             for(;;){
                 Product p = falta_prod(a);
                 if (p== null) break;;
-                p.cond.wait();
+                p.cond.await();
             }
 
             for(Product pp : a)  // p ele referia se a declaracao em cima entao renomeei

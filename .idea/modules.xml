@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Teórico Prática/Guiao1/Guiao1.iml" filepath="$PROJECT_DIR$/Teórico Prática/Guiao1/Guiao1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Teórico Prática/Guiao2/Guiao2.iml" filepath="$PROJECT_DIR$/Teórico Prática/Guiao2/Guiao2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Teórico Prática/Guiao3/Guiao3.iml" filepath="$PROJECT_DIR$/Teórico Prática/Guiao3/Guiao3.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Teórico Prática/Guiao4/Guiao4.iml" filepath="$PROJECT_DIR$/Teórico Prática/Guiao4/Guiao4.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Teórico Prática/Guiao5/Guiao5.iml" filepath="$PROJECT_DIR$/Teórico Prática/Guiao5/Guiao5.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Programa-o-Concorrente.iml" filepath="$PROJECT_DIR$/.idea/Programa-o-Concorrente.iml" />
+    </modules>
+  </component>
+</project>

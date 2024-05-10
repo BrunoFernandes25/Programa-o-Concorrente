@@ -58,7 +58,7 @@ class Warehouse {
             for (String s : items){
                 Product p = get(s);
                 while (p.quantity == 0)
-                    p.cond.wait(); // aqui fica bloqueado como pretendiamos
+                    p.cond.await(); // aqui fica bloqueado como pretendiamos
                 p.quantity--; //havendo quantidade entao decrementamos
             }
         }
