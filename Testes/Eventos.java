@@ -1,60 +1,57 @@
 import java.util.concurrent.locks.*;
 
 class Evento {
-    Lock l =new ReentrantLock();
-    Condition evento_tipo = l.newCondition();
+    private final Lock l = new ReentrantLock();
+    private final Condition evento_tipo = l.newCondition();
 
-    final int tipo1 = 1;
-    final int tipo2 = 2;
-    private int n1; //private para cada evento poder ter acesso e nao qualquer evento
-    private int n2;
+    private final int E; // Número total de tipos de eventos
+    private final int[] contagem; // Array para contar cada tipo de evento
 
-    //Criamos o construtor desdta forma para poder incrementar n1 e n2 a cada evento
-    Evento(int n1, int n2) {
-        this.n1 = n1;
-        this.n2 = n2;
+    // Construtor que inicializa a contagem de eventos e o número de tipos de eventos
+    Evento(int E) {
+        this.E = E;
+        this.contagem = new int[E + 1]; // Índices de 1 a E
     }
 
+    // Método espera que bloqueia até que os eventos tipo1 e tipo2 ocorram n1 e n2 vezes, respectivamente
     void espera(int tipo1, int n1, int tipo2, int n2) throws InterruptedException {
         l.lock();
-        try{
-            while( this.n1 < n1 || this.n2 < n2){
+        try {
+            while (contagem[tipo1] < n1 || contagem[tipo2] < n2) {
                 evento_tipo.await();
             }
-        }
-        finally {
+        } finally {
             l.unlock();
         }
     }
 
-    void sinaliza(int tipo){
+    // Método sinaliza que incrementa a contagem do tipo de evento e sinaliza todas as threads à espera
+    void sinaliza(int tipo) {
         l.lock();
-        try{
-            if(tipo == this.tipo1 && this.n1 < n1){
-                this.n1++;
+        try {
+            if (tipo >= 1 && tipo <= E) {
+                contagem[tipo]++;
+                evento_tipo.signalAll();
             }
-            if(tipo == this.tipo2 && this.n2 < n2){
-                this.n2++;
-            }
-            evento_tipo.signalAll();
-        }
-        finally {
+        } finally {
             l.unlock();
         }
     }
 }
 
-class Eventos extends Thread {
+class TesteEventos extends Thread {
     public static void main(String[] args) throws InterruptedException {
+        int E = 2; // Número de tipos de eventos
+        Evento evts = new Evento(E);
 
-        Evento evts = new Evento(4,3);
-
-        Thread threadEspera = new Thread (() -> {
-            try{
+        Thread threadEspera = new Thread(() -> {
+            try {
                 evts.espera(1, 4, 2, 3);
-            } catch (Exception e) { }
+                System.out.println("Os eventos necessários foram sinalizados!");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
-
 
         Thread threadSinaliza = new Thread(() -> {
             try {
@@ -64,6 +61,7 @@ class Eventos extends Thread {
 
                 System.out.println("vou sinalizar 2 1x");
                 evts.sinaliza(2);
+                Thread.sleep(100);
 
                 System.out.println("vou sinalizar 1 2x");
                 evts.sinaliza(1);
@@ -98,5 +96,4 @@ class Eventos extends Thread {
         threadEspera.join();
         threadSinaliza.join();
     }
-
 }
