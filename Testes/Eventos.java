@@ -88,11 +88,9 @@ class TesteEventos extends Thread {
             }
         });
 
-        // Iniciar as threads
         threadEspera.start();
         threadSinaliza.start();
 
-        // Aguardar término das threads
         threadEspera.join();
         threadSinaliza.join();
     }
