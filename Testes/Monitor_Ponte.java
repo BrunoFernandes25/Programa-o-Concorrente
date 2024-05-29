@@ -71,7 +71,6 @@ class Ponte {
             }
         };
     
-        // Cria e inicia threads de exemplo
         for (int i = 0; i < 12; i++) {
             new Thread(ida).start();
             new Thread(volta).start();
