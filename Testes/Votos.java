@@ -2,85 +2,97 @@ import java.util.HashMap;
 
 class Votacao {
 
-    HashMap <String,Integer> votos = new HashMap<String,Integer>();
+    private final HashMap<String, Integer> votos = new HashMap<>();
 
-    synchronized void espera(String c1,String c2,String c3) throws InterruptedException {
-        int cand1 = votos.get(c1);
-        int cand2 = votos.get(c2);
-        int cand3 = votos.get(c3);
+    // Método sincronizado para votar em um candidato
+    public synchronized void vota(String candidato) {
+        votos.put(candidato, votos.getOrDefault(candidato, 0) + 1);
+        System.out.println("Voto registrado para " + candidato + ". Total: " + votos.get(candidato));
+        notifyAll();
+    }
 
-        if(cand1 < cand2 && cand2 < cand3){
-            notifyAll();
-        }
-        else{
-            while(cand1 > cand2 || cand2 > cand3){
-                wait();
+    // Método sincronizado para esperar até que a condição V(c1) < V(c2) < V(c3) seja verdadeira
+    public synchronized void espera(String c1, String c2, String c3) throws InterruptedException {
+        while (true) {
+            int cand1 = votos.getOrDefault(c1, 0);
+            int cand2 = votos.getOrDefault(c2, 0);
+            int cand3 = votos.getOrDefault(c3, 0);
+
+            if (cand1 < cand2 && cand2 < cand3) {
+                System.out.println("Condição satisfeita: V(" + c1 + ") < V(" + c2 + ") < V(" + c3 + ")");
+                return;
+            } else {
+                System.out.println("Esperando... V(" + c1 + ")=" + cand1 + " V(" + c2 + ")=" + cand2 + " V(" + c3 + ")=" + cand3);
+                wait(); // Aguarda até que a condição seja satisfeita
             }
         }
-
     }
 
-    synchronized void vota(String candidato) {
-        if (votos.containsKey(candidato)) {
-            votos.put(candidato, votos.get(candidato) + 1);
-        } else {
-            votos.put(candidato, 1);
-        }
-    }
-}
-
-public class Votos {
+    // Método principal para testes
     public static void main(String[] args) {
         Votacao votacao = new Votacao();
 
-        // Votações
-        votacao.vota("candidato1");
-        votacao.vota("candidato2");
-        votacao.vota("candidato3");
-        votacao.vota("candidato1");
-        votacao.vota("candidato2");
-        votacao.vota("candidato2");
-        votacao.vota("candidato3");
-        votacao.vota("candidato3");
-        votacao.vota("candidato3");
-
-        // Thread 1 - Verificação
-        Thread thread1 = new Thread(() -> {
-            try {
-                System.out.println("Thread 1: Esperando sequência crescente...");
-                votacao.espera("candidato1", "candidato2", "candidato3");
-                System.out.println("Thread 1: Sequência crescente alcançada!");
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        // Exemplo de uso com threads
+        Runnable votarC1 = () -> {
+            for (int i = 0; i < 10; i++) {
+                votacao.vota("c1");
+                try {
+                    Thread.sleep(100); // Simula tempo entre votos
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
-        });
+        };
 
-        // Thread 2 - Nova votação
-        Thread thread2 = new Thread(() -> {
-            try {
-                Thread.sleep(2000); // Espera um pouco antes de realizar outra votação
-                System.out.println("Thread 2: Realizando nova votação...");
-                votacao.vota("candidato1");
-                votacao.vota("candidato2");
-                votacao.vota("candidato3");
-                System.out.println("Thread 2: Votação realizada!");
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        Runnable votarC2 = () -> {
+            for (int i = 0; i < 15; i++) {
+                votacao.vota("c2");
+                try {
+                    Thread.sleep(100); // Simula tempo entre votos
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
-        });
+        };
 
-        // Inicia as threads
-        thread1.start();
-        thread2.start();
+        Runnable votarC3 = () -> {
+            for (int i = 0; i < 20; i++) {
+                votacao.vota("c3");
+                try {
+                    Thread.sleep(100); // Simula tempo entre votos
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        };
 
-        // Aguarda o término das threads
+        Runnable esperar = () -> {
+            try {
+                votacao.espera("c1", "c2", "c3");
+                System.out.println("Condição de espera satisfeita: V(c1) < V(c2) < V(c3)");
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        };
+
+        // Cria e inicia threads de exemplo
+        Thread t1 = new Thread(votarC1);
+        Thread t2 = new Thread(votarC2);
+        Thread t3 = new Thread(votarC3);
+        Thread t4 = new Thread(esperar);
+
+        t1.start();
+        t2.start();
+        t3.start();
+        t4.start();
+
         try {
-            thread1.join();
-            thread2.join();
+            t1.join();
+            t2.join();
+            t3.join();
+            t4.join();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
-
-        System.out.println("Todas as threads foram concluídas.");
     }
 }
