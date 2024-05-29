@@ -1,5 +1,6 @@
 import java.util.Random;
-import static java.lang.Thread.*;
+
+import static java.lang.Thread.sleep;
 
 interface Jogo {
     Partida participa() throws InterruptedException;
@@ -10,17 +11,17 @@ interface Partida {
 }
 
 class JogoImpl implements Jogo {
-    private PartidaImpl partida = new PartidaImpl();
+    private PartidaImpl p = new PartidaImpl();
     private int jogadores = 0;
 
     public synchronized Partida participa() throws InterruptedException {
         jogadores++;
-        PartidaImpl p = partida;
+        PartidaImpl atual = p;
 
         if(jogadores == 4) {
             notifyAll();
             jogadores = 0;
-            partida = new PartidaImpl();     //nova partida para os proximos
+            p = new PartidaImpl();     //nova partida para os proximos
 
             new Thread(() -> {              //conta os 60 segundos ate disparar
                 try {
@@ -31,14 +32,14 @@ class JogoImpl implements Jogo {
             }).start();
         }
         else{
-            while(p == partida) wait();
+            while(p == atual) wait();
         }
-        return p;
+        return atual;
     }
 }
 
 class PartidaImpl implements Partida {
-    int tentativas = 100;
+    int tentativas = 0;
     int numero = new Random().nextInt(100);
     boolean ganhou = false;
     boolean timeout = false;
@@ -48,17 +49,17 @@ class PartidaImpl implements Partida {
     }
 
     public synchronized String adivinha(int n) {
-        if (ganhou) return "PERDEU";
-        else if (tentativas >= 100) return "TENTATIVAS";
-        else if (timeout) return "TEMPO";
-        else {
-            tentativas++;
-            if (n > numero) return "MENOR";
-            else if (n < numero) return "MAIOR";
-            else {
-                ganhou = true;
-                return "GANHOU";
-            }
+        tentativas += 1;
+
+        if(ganhou) return "PERDEU";
+        if(timeout) return "TEMPO";
+        if(tentativas > 100) return "TENTATIVAS";
+        if(n == numero) {
+            ganhou = true;
+            return "GANHOU";
         }
+        if(numero < n) return "MENOR";
+        return "MAIOR";
     }
+
 }
