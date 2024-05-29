@@ -2,7 +2,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-//COM SIGNALS
+
 class Ponte {
     int ocupacao = 0;
     Lock l = new ReentrantLock();
@@ -12,11 +12,11 @@ class Ponte {
         l.lock();
         try {
             while (ocupacao == 10) {
-                System.out.println("\nPonte cheia\n");
+                System.out.println("\nPonte cheia, esperando...");
                 travessiaPossivel.await();
             }
             ocupacao++;
-            Thread.sleep(500);
+            System.out.println("Início travessia ida. Ocupação: " + ocupacao);
         } finally {
             l.unlock();
         }
@@ -26,11 +26,11 @@ class Ponte {
         l.lock();
         try {
             while (ocupacao == 10) {
-                System.out.println("\nPonte cheia\n");
+                System.out.println("Ponte cheia, esperando...");
                 travessiaPossivel.await();
             }
             ocupacao++;
-            Thread.sleep(500);
+            System.out.println("Início travessia volta. Ocupação: " + ocupacao);
         } finally {
             l.unlock();
         }
@@ -40,93 +40,42 @@ class Ponte {
         l.lock();
         try {
             ocupacao--;
+            System.out.println("Fim travessia. Ocupação: " + ocupacao);
             travessiaPossivel.signalAll();
         } finally {
             l.unlock();
         }
     }
-}
 
-
-/*
-class Ponte {
-    int ocupacao = 0;
-    Lock l = new ReentrantLock();
-
-    void inicioTravessiaIda() throws InterruptedException {
-        l.lock();
-        try {
-            while (ocupacao == 10) {
-                System.out.println("\nPonte cheia\n");
-                wait();
-            }
-            ocupacao++;
-            Thread.sleep(500);
-        } finally {
-            l.unlock();
-        }
-    }
-
-    void inicioTravessiaVolta() throws InterruptedException {
-        l.lock();
-        try {
-            while (ocupacao == 10) {
-                System.out.println("\nPonte cheia\n");
-                wait();
-            }
-            ocupacao++;
-            Thread.sleep(500);
-        } finally {
-            l.unlock();
-        }
-    }
-
-    synchronized void fimTravessia() {
-            ocupacao--;
-            notifyAll();
-    }
-}*/
-
-public class Monitor_Ponte {
     public static void main(String[] args) {
-        Ponte ponte = new Ponte(); // Instância única de Ponte para todas as threads
-        Thread[] threads = new Thread[30]; // Array para armazenar as threads
-
-        // Cria e inicia múltiplas threads para simular a travessia
-        for (int i = 0; i < threads.length; i++) {
-            final int index = i; // Índice da thread atual
-
-            threads[i] = new Thread(() -> {
-                try {
-                    if (index % 2 != 0) {
-                        ponte.inicioTravessiaIda();
-                        System.out.println("Travessia de ida iniciada por thread " + Thread.currentThread().getId());
-                    } else {
-                        ponte.inicioTravessiaVolta();
-                        System.out.println("Travessia de volta iniciada por thread " + Thread.currentThread().getId());
-                    }
-
-                    Thread.sleep(500); // Simulando travessia
-                    ponte.fimTravessia();
-                    System.out.println("Travessia finalizada por thread " + Thread.currentThread().getId());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            });
-
-            // Inicia a thread
-            threads[i].start();
-        }
-
-        // Aguarda o término de todas as threads
-        for (Thread thread : threads) {
+        Ponte ponte = new Ponte();
+    
+        // Exemplo de uso com threads
+        Runnable ida = () -> {
             try {
-                thread.join();
+                ponte.inicioTravessiaIda();
+                Thread.sleep(1000); // Simula o tempo de travessia
+                ponte.fimTravessia();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
+        };
+    
+        Runnable volta = () -> {
+            try {
+                ponte.inicioTravessiaVolta();
+                Thread.sleep(1000); // Simula o tempo de travessia
+                ponte.fimTravessia();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        };
+    
+        // Cria e inicia threads de exemplo
+        for (int i = 0; i < 12; i++) {
+            new Thread(ida).start();
+            new Thread(volta).start();
         }
-
         System.out.println("Todas as travessias foram concluídas.");
     }
 }
