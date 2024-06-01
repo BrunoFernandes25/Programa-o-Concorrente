@@ -29,9 +29,9 @@ public class Screen extends PApplet {
     public void settings() {
         String connectionUrl = System.getenv("SERVER_CONNECTION_URL");
         if (connectionUrl == null) {
-            connectionUrl = "127.0.0.1:12345";
+            connectionUrl = "127.0.0.1:12345";                    //O programa assume um valor padrão de "127.0.0.1:12345" caso connectionUrl nao tenha sido definida
         }
-        String[] ipPort = connectionUrl.split(":");
+        String[] ipPort = connectionUrl.split(":");                //Divide o URL de conexão em duas partes: o endereço IP e o número da porta.
         try {
             sv = new Server(Inet4Address.getByName(ipPort[0]), Integer.parseInt(ipPort[1]));
         } catch (IOException e) {
@@ -41,13 +41,13 @@ public class Screen extends PApplet {
         size(1280, 720);
     }
 
-    public void stop() {
+    public void stop() {            //usado para desligar o servidor quando é fechado o jogo
         if (sv != null) {
             sv.shutdown();
         }
     }
 
-    public void setup() {
+    public void setup() {        //Método de configuração inicial, carrega as imagens necessárias
         sun = requestImage("images/sun.png");
         ex = loadImage("images/example.png");
         planets.add(requestImage("images/mercury.png"));
@@ -174,7 +174,7 @@ public class Screen extends PApplet {
         text(passwordInput.toString(), (float) width / 2 - 50, (float) height / 2 + 50);
     }
 
-    private void top() {
+    private void top() {                    //método de desenho do top10
         background(195, 203, 255);
         for (int i = 0; i < top10.size(); i++) {
             var username = top10.get(i).getKey();
@@ -221,11 +221,11 @@ public class Screen extends PApplet {
     }
 
     private void game() {
-        List<GameObject> objects = sv.getGameState();
-        int[] cor = cores.get(sv.getId() - 1);
-        var fuel = sv.getFuel();
+        List<GameObject> objects = sv.getGameState();     // Obtém o estado atual do jogo a partir do servidor. A lista objects contém todos os objetos (jogadores, sóis, planetas) no jogo.
+        int[] cor = cores.get(sv.getId() - 1);           // Obtém a cor do jogador atual com base no ID do jogador retornado pelo servidor
+        var fuel = sv.getFuel();                        // Obtém o nível de combustível do jogador atual a partir do servidor
         background(255);
-        for (GameObject p : objects) {
+        for (GameObject p : objects) {                 // Desenha cada objeto de acordo com o que é, Jogador,Planeta ou Sol
             if (p.isPlayer()) {
                 pushMatrix();
                 translate((float) p.getX(), (float) p.getY());
@@ -239,10 +239,10 @@ public class Screen extends PApplet {
             }
         }
 
-        if (fuel >= 0.0) {
+        if (fuel >= 0.0) {                        //Se >= 0 entao desenha uma barra de combustível na tela
             fill(200);
             rect(width - 70, 40, 30, 200);
-            fill(cor[0], cor[1], cor[2]);
+            fill(cor[0], cor[1], cor[2]);        //define a cor do preenchimento da barra de combustível com base na cor do jogador.
             rect(width - 70, 40 + 200 - (2 * (float) fuel), 30, 2 * (float) fuel);
         }
     }
@@ -277,14 +277,14 @@ public class Screen extends PApplet {
         textSize(40);
     }
 
-    private boolean submit(State currentState) {
+    private boolean submit(State currentState) {           // envia uma tentativa de login, registo ou elimina utilizador
         boolean attempt = switch (currentState) {
             case State.LOGIN -> sv.login(usernameInput.toString(), passwordInput.toString());
             case State.REGISTER -> sv.signup(usernameInput.toString(), passwordInput.toString());
             case State.DELETE -> sv.delete(usernameInput.toString(), passwordInput.toString());
             default -> throw new RuntimeException();
         };
-        usernameInput.setLength(0);
+        usernameInput.setLength(0);            //os campos de entrada de utilizador são limpos (são tornados vazios)
         passwordInput.setLength(0);
         return attempt;
     }
@@ -311,33 +311,33 @@ public class Screen extends PApplet {
             if (text.equals("Top 10")) top10 = sv.top10();
         }
     }
-
-    public void startGame() {
+                                          //Definições do estado do jogo:
+    public void startGame() {            //indicando que o jogo está em andamento
         setState(State.GAME);
     }
 
-    public void winMatch() {
+    public void winMatch() {            //indicando que o jogador ganhou a partida
         setState(State.WIN_MATCH);
     }
 
-    public void loseMatch() {
+    public void loseMatch() {            //indicando que o jogador perdeu a partida
         setState(State.LOSE_MATCH);
     }
 
-    public void drawMatch() {
+    public void drawMatch() {             //indicando que o jogador empatou a partida
         setState(State.DRAW_MATCH);
     }
 
-    private State getState() {
-        stateLock.lock();
-        var res = state;
-        stateLock.unlock();
+    private State getState() {            
+        stateLock.lock();                    //Bloqueia o estado atual do jogo
+        var res = state;                    //obtém o valor e
+        stateLock.unlock();                //desbloqueia o estado antes de retorná-lo
         return res;
     }
 
     public void setState(State s) {
-        stateLock.lock();
-        state = s;
-        stateLock.unlock();
+        stateLock.lock();                  //Bloqueia o estado atual do jogo
+        state = s;                        //define o novo estado
+        stateLock.unlock();              //desbloqueia o estado
     }
 }
