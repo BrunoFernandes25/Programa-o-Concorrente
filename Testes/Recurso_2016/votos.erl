@@ -34,8 +34,7 @@ loop(C1, C2, C3) ->
         {wait, From} ->
             if
                 C3 > C1 andalso C3 > C2 ->
-                    From ! condition_met,
-                    loop(C1, C2, C3);
+                    From ! condition_met;
                 true ->
                     loop(C1, C2, C3)
             end
