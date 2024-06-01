@@ -18,12 +18,12 @@ public class Server {
     private String username = "";
     private int id;
 
-    public Server(InetAddress address, int port) throws IOException {
+    public Server(InetAddress address, int port) throws IOException {                //Esta classe representa a conexão do cliente com o servidor do jogo
         socket = new Socket(address, port);
         in = socket.getInputStream();
         out = socket.getOutputStream();
-        data = new GameData(in);
-    }
+        data = new GameData(in);                              //Aqui é criado GameData
+    }                                                        //Server é responsável por iniciar uma thread de GameData que cuida da recepção e do processamento dos dados do jogo enviados pelo servidor
 
     public String getUsername() {
         return username;
@@ -98,7 +98,7 @@ public class Server {
             OtpErlangTuple response = Util.readTuple(in);
             if (response.elementAt(1).equals(Util.START)) {
                 id = (int) ((OtpErlangLong) (response.elementAt(2))).longValue();
-                data.init(screen);
+                data.init(screen);                                                    // Aqui ocorre a inicialização do GameData
             } else {
                 screen.setState(State.LOGGED_IN);
             }
@@ -174,20 +174,20 @@ class GameData extends Thread {
         start();
     }
 
-    public int getLvl() {
+    public int getLvl() {                //Contém informações como nível do jogador
         lvlLock.lock();
         var res = lvl;
         lvlLock.unlock();
         return res;
     }
 
-    public void setLvl(int newLvl) {
+    public void setLvl(int newLvl) {        
         lvlLock.lock();
         lvl = newLvl;
         lvlLock.unlock();
     }
 
-    public int getWins() {
+    public int getWins() {                //número de vitórias 
         winsLock.lock();
         var res = wins;
         winsLock.unlock();
@@ -200,7 +200,7 @@ class GameData extends Thread {
         winsLock.unlock();
     }
 
-    public double getFuel() {
+    public double getFuel() {    //quantidade de combustível disponível
         fuelLock.lock();
         var res = fuel;
         fuelLock.unlock();
