@@ -2,7 +2,6 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-
 class Ponte {
     int ocupacao = 0;
     Lock l = new ReentrantLock();
@@ -12,11 +11,11 @@ class Ponte {
         l.lock();
         try {
             while (ocupacao == 10) {
-                System.out.println("\nPonte cheia, esperando...");
+                //System.out.println("\nPonte cheia, esperando...");
                 travessiaPossivel.await();
             }
             ocupacao++;
-            System.out.println("Início travessia ida. Ocupação: " + ocupacao);
+            //System.out.println("Início travessia ida. Ocupação: " + ocupacao);
         } finally {
             l.unlock();
         }
@@ -26,11 +25,11 @@ class Ponte {
         l.lock();
         try {
             while (ocupacao == 10) {
-                System.out.println("Ponte cheia, esperando...");
+                //System.out.println("Ponte cheia, esperando...");
                 travessiaPossivel.await();
             }
             ocupacao++;
-            System.out.println("Início travessia volta. Ocupação: " + ocupacao);
+            //System.out.println("Início travessia volta. Ocupação: " + ocupacao);
         } finally {
             l.unlock();
         }
@@ -40,12 +39,14 @@ class Ponte {
         l.lock();
         try {
             ocupacao--;
-            System.out.println("Fim travessia. Ocupação: " + ocupacao);
+            //System.out.println("Fim travessia. Ocupação: " + ocupacao);
             travessiaPossivel.signalAll();
         } finally {
             l.unlock();
         }
     }
+
+
 
     public static void main(String[] args) {
         Ponte ponte = new Ponte();

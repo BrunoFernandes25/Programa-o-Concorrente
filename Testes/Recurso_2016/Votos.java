@@ -5,14 +5,12 @@ class Votacao {
     private final HashMap<String, Integer> votos = new HashMap<>();
     private boolean condicaoSatisfeita = false;
 
-    // Método sincronizado para votar em um candidato
     public synchronized void vota(String candidato) {
         votos.put(candidato, votos.getOrDefault(candidato, 0) + 1);
-        System.out.println("Voto registrado para " + candidato + ". Total: " + votos.get(candidato));
+        //System.out.println("Voto registrado para " + candidato + ". Total: " + votos.get(candidato));
         if(!condicaoSatisfeita) notifyAll();
     }
 
-    // Método sincronizado para esperar até que a condição V(c1) < V(c2) < V(c3) seja verdadeira
     public synchronized void espera(String c1, String c2, String c3) throws InterruptedException {
         while (!condicaoSatisfeita) {
             int cand1 = votos.getOrDefault(c1, 0);
@@ -21,15 +19,14 @@ class Votacao {
 
             if (cand1 < cand2 && cand2 < cand3) {
                 condicaoSatisfeita = true;
-                System.out.println("Condição satisfeita: V(" + c1 + ") < V(" + c2 + ") < V(" + c3 + ")");
+                //System.out.println("Condição satisfeita: V(" + c1 + ") < V(" + c2 + ") < V(" + c3 + ")");
             } else {
-                System.out.println("Esperando... V(" + c1 + ")=" + cand1 + " V(" + c2 + ")=" + cand2 + " V(" + c3 + ")=" + cand3);
+                //System.out.println("Esperando... V(" + c1 + ")=" + cand1 + " V(" + c2 + ")=" + cand2 + " V(" + c3 + ")=" + cand3);
                 wait(); // Aguarda até que a condição seja satisfeita
             }
         }
     }
 
-    // Método principal para testes
     public static void main(String[] args) {
         Votacao votacao = new Votacao();
 
