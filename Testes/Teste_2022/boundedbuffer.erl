@@ -19,7 +19,7 @@ matcher([Prod| Prods],[Con| Cons]) ->
   BB = newBoundedBuffer:new(),
   Prod ! {BB,self()},
   Con ! {BB,self()},
-  matcher([Prods],[Cons]);
+  matcher(Prods,Cons);
 
 matcher(Prods,Cons)->
   receive
