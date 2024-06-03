@@ -26,7 +26,6 @@ loop(E, Contagem) ->
                     From ! ok,
                     loop(E, Contagem);
                 true ->
-                    From ! {wait, Tipo1, N1, Tipo2, N2},
                     loop(E, Contagem)
             end
     end.
